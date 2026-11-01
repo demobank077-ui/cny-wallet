@@ -3,138 +3,292 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CNY Wallet</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#f2f6fc;color:#183451;font-family:Arial,sans-serif}
-header{background:#174b87;color:white;padding:22px}
-header h2{margin:0}
+body{margin:0;background:#05091b;color:#fff;font-family:Arial,sans-serif}
+header{padding:22px 18px;background:#101a35;font-size:25px;font-weight:bold}
 main{max-width:650px;margin:auto;padding:18px}
-.card{background:white;border-radius:15px;padding:20px;margin-bottom:16px;box-shadow:0 3px 14px #173d7212}
-.blue{background:#174b87;color:white}
-.balance{font-size:32px;font-weight:bold;margin:12px 0}
-input,select{width:100%;padding:14px;border:1px solid #ccd6e2;border-radius:9px;margin:8px 0 15px;font-size:16px}
-button{border:0;border-radius:9px;padding:13px;background:#174b87;color:white;font-size:15px;font-weight:bold;cursor:pointer}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.actions button{background:#e9f2fc;color:#174b87}
-h3{margin-top:0}
-small{color:#63778c}
-.item{padding:12px 0;border-bottom:1px solid #edf0f4}
-a{color:#174b87;text-decoration:none}
-footer{text-align:center;color:#718096;padding:20px}
+.card{background:#111c35;border:1px solid #243454;border-radius:20px;padding:22px;margin:18px 0}
+.clock{background:linear-gradient(110deg,#079ee8,#2459ed);text-align:center;border-radius:20px;padding:22px}
+.clock .time{font-size:36px;font-weight:bold;margin:8px 0}
+h2{font-size:22px;margin:0 0 20px}
+h3{font-size:18px;margin:0 0 15px}
+.balance{font-size:36px;font-weight:bold;color:#fff;margin:12px 0}
+.muted{color:#aebbd2}
+input,select{width:100%;padding:16px;margin:8px 0 14px;border:0;border-radius:12px;background:#202c43;color:white;font-size:16px}
+button{width:100%;padding:16px;border:0;border-radius:12px;background:linear-gradient(90deg,#1769f4,#079fe5);color:white;font-size:17px;font-weight:bold;margin-top:8px}
+button.secondary{background:#263958}
+.row{display:flex;gap:10px}
+.row button{flex:1}
+.entry{padding:13px 0;border-bottom:1px solid #293752;line-height:1.6}
+.negative{color:#ff8585}
+.positive{color:#7ce0a2}
+nav{display:flex;gap:8px;overflow-x:auto;padding:12px 0}
+nav a{white-space:nowrap;background:#142747;padding:13px;border-radius:12px;color:white;text-decoration:none}
+small{color:#aebbd2}
+footer{text-align:center;color:#8795ad;padding:30px}
 </style>
 </head>
 <body>
-<header><h2>CNY WALLET</h2></header>
+
+<header>CNY WALLET</header>
+
 <main>
-<section class="card blue">
-<small style="color:#dceaff">Available balance</small>
-<div class="balance" id="balance">¥0.00</div>
-<small style="color:#dceaff">Chinese Yuan · CNY</small>
+<section class="clock">
+<div id="greeting">Good morning</div>
+<div class="time" id="clock">--:--:--</div>
+<div id="today"></div>
 </section>
 
-<section class="card">
-<h3>Account overview</h3>
-<p>Wallet name: CNY Wallet</p>
-<p>Currency: Chinese Yuan (CNY)</p>
-<p>Wallet type: Personal finance tracker</p>
-</section>
+<h2 style="margin:25px 4px">Hi 程的 Cheng Er34</h2>
 
 <section class="card">
-<h3>Record a transaction</h3>
-<label>Transaction type</label>
-<select id="type">
-<option value="income">Deposit / Income</option>
-<option value="expense">Withdrawal / Expense</option>
-</select>
-<label>Amount (CNY ¥)</label>
-<input id="amount" type="number" min="0.01" step="0.01" placeholder="Enter amount">
+<h3>Available balance</h3>
+<div class="balance" id="balance">¥6,653,800.00</div>
+<div class="muted">Chinese Yuan · CNY</div>
+</section>
+
+<nav>
+<a href="#home">Home</a>
+<a href="#payment">Payment</a>
+<a href="#admin">Balance Editor</a>
+<a href="#history">History</a>
+<a href="#activity">Login Activity</a>
+</nav>
+
+<section class="card" id="payment">
+<h2>Payment</h2>
+<label>Payment amount (CNY)</label>
+<input id="paymentAmount" type="number" min="0.01" step="0.01" placeholder="Enter payment amount">
 <label>Description</label>
-<input id="description" placeholder="Transaction description">
-<button onclick="record()" style="width:100%">Save transaction</button>
+<input id="paymentDescription" maxlength="100" placeholder="Payment description">
+<button onclick="makePayment()">Record payment</button>
+<p class="muted" id="paymentMessage"></p>
+</section>
+
+<section class="card" id="admin">
+<h2>Admin Balance Editor</h2>
+<p class="muted">Use this section to manage the displayed wallet balance.</p>
+<label>New balance (CNY)</label>
+<input id="newBalance" type="number" min="0" step="0.01" placeholder="Enter new balance">
+<button onclick="setBalance()">Set balance</button>
+<hr style="border-color:#293752;margin:22px 0">
+<label>Amount to add (CNY)</label>
+<input id="addAmount" type="number" min="0.01" step="0.01" placeholder="Enter amount to add">
+<button class="secondary" onclick="addBalance()">Add to balance</button>
+<p class="muted" id="adminMessage"></p>
+</section>
+
+<section class="card" id="history">
+<h2>Transaction history</h2>
+<div id="transactions"><p class="muted">No transactions recorded.</p></div>
+</section>
+
+<section class="card" id="activity">
+<h2>Login Activity</h2>
+<p class="muted">Record the country for this browser session. The time zone is read from this device.</p>
+<label>Country</label>
+<input id="country" placeholder="Enter country">
+<button onclick="recordLogin()">Record login activity</button>
+<div id="loginHistory" style="margin-top:18px"></div>
 </section>
 
 <section class="card">
-<h3>Payments and bills</h3>
-<div class="actions">
-<button onclick="bill('Apple Card')">Apple Card</button>
-<button onclick="bill('Amazon')">Amazon</button>
-<button onclick="bill('Electricity')">Electricity bill</button>
-<button onclick="bill('Other')">Other expenses</button>
+<h2>Payments and bills</h2>
+<div class="row">
+<button class="secondary" onclick="bill('Apple Card')">Apple Card</button>
+<button class="secondary" onclick="bill('Amazon')">Amazon</button>
 </div>
+<div class="row">
+<button class="secondary" onclick="bill('Electricity bill')">Electricity bill</button>
+<button class="secondary" onclick="bill('Other expenses')">Other expenses</button>
+</div>
+<p class="muted">Choose a category to place its name in the payment description.</p>
 </section>
 
 <section class="card">
-<h3>Transaction history</h3>
-<div id="history">No transactions recorded.</div>
+<h2>Customer support</h2>
+<p class="muted">Add your support contact details when ready.</p>
 </section>
 
-<section class="card">
-<h3>Customer support</h3>
-<p><a id="wa" href="#">WhatsApp support</a></p>
-<p><a id="mail" href="#">Email support</a></p>
-</section>
-</main>
 <footer>CNY WALLET</footer>
+</main>
 
 <script>
-let balance=Number(localStorage.getItem('cnyBalance')||0);
-let transactions=JSON.parse(localStorage.getItem('cnyTransactions')||'[]');
+const initialBalance = 6653800;
 
-function money(n){
-return '¥'+Number(n).toLocaleString('zh-CN',{
-minimumFractionDigits:2,
-maximumFractionDigits:2
-});
+let balance = Number(localStorage.getItem("cny_balance"));
+if (!Number.isFinite(balance)) {
+  balance = initialBalance;
+  localStorage.setItem("cny_balance", balance);
 }
-function render(){
-document.getElementById('balance').textContent=money(balance);
-let h=document.getElementById('history');
-h.innerHTML='';
-if(!transactions.length){
-h.textContent='No transactions recorded.';
-return;
+
+let transactions = JSON.parse(localStorage.getItem("cny_transactions") || "[]");
+let logins = JSON.parse(localStorage.getItem("cny_logins") || "[]");
+
+function money(value) {
+  return "¥" + Number(value).toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
 }
-transactions.forEach(t=>{
-let div=document.createElement('div');
-div.className='item';
-div.textContent=t.date+' · '+t.name+' · '+money(t.amount);
-h.appendChild(div);
-});
+
+function saveData() {
+  localStorage.setItem("cny_balance", balance);
+  localStorage.setItem("cny_transactions", JSON.stringify(transactions));
+  localStorage.setItem("cny_logins", JSON.stringify(logins));
+  render();
 }
-function record(){
-let amount=Number(document.getElementById('amount').value);
-let type=document.getElementById('type').value;
-let name=document.getElementById('description').value.trim();
-if(!amount||amount<=0||!name){
-alert('Enter a valid amount and description.');
-return;
+
+function render() {
+  document.getElementById("balance").textContent = money(balance);
+
+  const area = document.getElementById("transactions");
+  area.innerHTML = "";
+
+  if (!transactions.length) {
+    area.innerHTML = '<p class="muted">No transactions recorded.</p>';
+  } else {
+    transactions.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "entry";
+      div.innerHTML =
+        '<strong class="negative">Payment · -' + money(item.amount) +
+        '</strong><br>' +
+        '<span></span><br><small></small>';
+      div.querySelector("span").textContent = item.description;
+      div.querySelector("small").textContent = item.date;
+      area.appendChild(div);
+    });
+  }
+
+  const loginArea = document.getElementById("loginHistory");
+  loginArea.innerHTML = "";
+
+  if (!logins.length) {
+    loginArea.innerHTML = '<p class="muted">No login activity recorded.</p>';
+  } else {
+    logins.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "entry";
+      div.innerHTML = "<strong></strong><br><small></small>";
+      div.querySelector("strong").textContent = item.country;
+      div.querySelector("small").textContent =
+        item.date + " · " + item.timezone;
+      loginArea.appendChild(div);
+    });
+  }
 }
-if(type==='expense'&&amount>balance){
-alert('Insufficient recorded balance.');
-return;
+
+function makePayment() {
+  const amount = Number(document.getElementById("paymentAmount").value);
+  const description =
+    document.getElementById("paymentDescription").value.trim();
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    alert("Enter a valid payment amount.");
+    return;
+  }
+
+  if (amount > balance) {
+    alert("Insufficient balance.");
+    return;
+  }
+
+  if (!description) {
+    alert("Enter a payment description.");
+    return;
+  }
+
+  balance -= amount;
+  transactions.unshift({
+    amount,
+    description,
+    date: new Date().toLocaleString()
+  });
+
+  document.getElementById("paymentAmount").value = "";
+  document.getElementById("paymentDescription").value = "";
+  document.getElementById("paymentMessage").textContent =
+    "Payment recorded. Balance updated.";
+
+  saveData();
 }
-balance+=type==='income'?amount:-amount;
-transactions.unshift({
-date:new Date().toLocaleString(),
-name:(type==='income'?'Income: ':'Expense: ')+name,
-amount:amount
-});
-save();
-document.getElementById('amount').value='';
-document.getElementById('description').value='';
+
+function setBalance() {
+  const amount = Number(document.getElementById("newBalance").value);
+
+  if (!Number.isFinite(amount) || amount < 0) {
+    alert("Enter a valid balance.");
+    return;
+  }
+
+  balance = amount;
+  document.getElementById("newBalance").value = "";
+  document.getElementById("adminMessage").textContent =
+    "Balance updated successfully.";
+  saveData();
 }
-function bill(name){
-document.getElementById('description').value=name+' bill';
-document.getElementById('type').value='expense';
-document.getElementById('amount').focus();
+
+function addBalance() {
+  const amount = Number(document.getElementById("addAmount").value);
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    alert("Enter a valid amount to add.");
+    return;
+  }
+
+  balance += amount;
+  document.getElementById("addAmount").value = "";
+  document.getElementById("adminMessage").textContent =
+    "Amount added to the displayed balance.";
+  saveData();
 }
-function save(){
-localStorage.setItem('cnyBalance',balance);
-localStorage.setItem('cnyTransactions',JSON.stringify(transactions));
-render();
+
+function recordLogin() {
+  const country = document.getElementById("country").value.trim();
+
+  if (!country) {
+    alert("Enter the country for this login.");
+    return;
+  }
+
+  logins.unshift({
+    country,
+    date: new Date().toLocaleString(),
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+  });
+
+  document.getElementById("country").value = "";
+  saveData();
 }
+
+function bill(name) {
+  document.getElementById("paymentDescription").value = name;
+  document.getElementById("payment").scrollIntoView({behavior:"smooth"});
+}
+
+function updateClock() {
+  const now = new Date();
+  const hour = now.getHours();
+
+  document.getElementById("greeting").textContent =
+    hour < 12 ? "Good Morning" :
+    hour < 18 ? "Good Afternoon" : "Good Evening";
+
+  document.getElementById("clock").textContent =
+    now.toLocaleTimeString();
+
+  document.getElementById("today").textContent =
+    now.toLocaleDateString(undefined, {
+      weekday:"short", month:"short", day:"numeric", year:"numeric"
+    });
+}
+
+updateClock();
+setInterval(updateClock, 1000);
 render();
 </script>
 </body>
