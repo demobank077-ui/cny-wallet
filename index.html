@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CNY Wallet</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f2f6fc;color:#183451;font-family:Arial,sans-serif}
+header{background:#174b87;color:white;padding:22px}
+header h2{margin:0}
+main{max-width:650px;margin:auto;padding:18px}
+.card{background:white;border-radius:15px;padding:20px;margin-bottom:16px;box-shadow:0 3px 14px #173d7212}
+.blue{background:#174b87;color:white}
+.balance{font-size:32px;font-weight:bold;margin:12px 0}
+input,select{width:100%;padding:14px;border:1px solid #ccd6e2;border-radius:9px;margin:8px 0 15px;font-size:16px}
+button{border:0;border-radius:9px;padding:13px;background:#174b87;color:white;font-size:15px;font-weight:bold;cursor:pointer}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.actions button{background:#e9f2fc;color:#174b87}
+h3{margin-top:0}
+small{color:#63778c}
+.item{padding:12px 0;border-bottom:1px solid #edf0f4}
+a{color:#174b87;text-decoration:none}
+footer{text-align:center;color:#718096;padding:20px}
+</style>
+</head>
+<body>
+<header><h2>CNY WALLET</h2></header>
+<main>
+<section class="card blue">
+<small style="color:#dceaff">Available balance</small>
+<div class="balance" id="balance">¥0.00</div>
+<small style="color:#dceaff">Chinese Yuan · CNY</small>
+</section>
+
+<section class="card">
+<h3>Account overview</h3>
+<p>Wallet name: CNY Wallet</p>
+<p>Currency: Chinese Yuan (CNY)</p>
+<p>Wallet type: Personal finance tracker</p>
+</section>
+
+<section class="card">
+<h3>Record a transaction</h3>
+<label>Transaction type</label>
+<select id="type">
+<option value="income">Deposit / Income</option>
+<option value="expense">Withdrawal / Expense</option>
+</select>
+<label>Amount (CNY ¥)</label>
+<input id="amount" type="number" min="0.01" step="0.01" placeholder="Enter amount">
+<label>Description</label>
+<input id="description" placeholder="Transaction description">
+<button onclick="record()" style="width:100%">Save transaction</button>
+</section>
+
+<section class="card">
+<h3>Payments and bills</h3>
+<div class="actions">
+<button onclick="bill('Apple Card')">Apple Card</button>
+<button onclick="bill('Amazon')">Amazon</button>
+<button onclick="bill('Electricity')">Electricity bill</button>
+<button onclick="bill('Other')">Other expenses</button>
+</div>
+</section>
+
+<section class="card">
+<h3>Transaction history</h3>
+<div id="history">No transactions recorded.</div>
+</section>
+
+<section class="card">
+<h3>Customer support</h3>
+<p><a id="wa" href="#">WhatsApp support</a></p>
+<p><a id="mail" href="#">Email support</a></p>
+</section>
+</main>
+<footer>CNY WALLET</footer>
+
+<script>
+let balance=Number(localStorage.getItem('cnyBalance')||0);
+let transactions=JSON.parse(localStorage.getItem('cnyTransactions')||'[]');
+
+function money(n){
+return '¥'+Number(n).toLocaleString('zh-CN',{
+minimumFractionDigits:2,
+maximumFractionDigits:2
+});
+}
+function render(){
+document.getElementById('balance').textContent=money(balance);
+let h=document.getElementById('history');
+h.innerHTML='';
+if(!transactions.length){
+h.textContent='No transactions recorded.';
+return;
+}
+transactions.forEach(t=>{
+let div=document.createElement('div');
+div.className='item';
+div.textContent=t.date+' · '+t.name+' · '+money(t.amount);
+h.appendChild(div);
+});
+}
+function record(){
+let amount=Number(document.getElementById('amount').value);
+let type=document.getElementById('type').value;
+let name=document.getElementById('description').value.trim();
+if(!amount||amount<=0||!name){
+alert('Enter a valid amount and description.');
+return;
+}
+if(type==='expense'&&amount>balance){
+alert('Insufficient recorded balance.');
+return;
+}
+balance+=type==='income'?amount:-amount;
+transactions.unshift({
+date:new Date().toLocaleString(),
+name:(type==='income'?'Income: ':'Expense: ')+name,
+amount:amount
+});
+save();
+document.getElementById('amount').value='';
+document.getElementById('description').value='';
+}
+function bill(name){
+document.getElementById('description').value=name+' bill';
+document.getElementById('type').value='expense';
+document.getElementById('amount').focus();
+}
+function save(){
+localStorage.setItem('cnyBalance',balance);
+localStorage.setItem('cnyTransactions',JSON.stringify(transactions));
+render();
+}
+render();
+</script>
+</body>
+</html>
